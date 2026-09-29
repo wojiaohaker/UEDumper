@@ -66,6 +66,25 @@ public:
 	//however the NumElementsPerChunk changed from 65 * 1024 to 64 * 1024 for >= 4.21
 	//https://github.com/EpicGames/UnrealEngine/blob/4.21/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h#L321
 	//-> https://github.com/EpicGames/UnrealEngine/blob/4.21/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h#L960
+#if UE_VERSION >= UE_5_08
+	// UE 5.8 reordered the members: NumElements/MaxElements/NumChunks/MaxChunks follow the Objects pointer,
+	// and PreAllocatedObjects moved to the very end (see UObjectArray.h@FChunkedFixedUObjectArray).
+	struct FChunkedFixedUObjectArray
+	{
+		/** Primary table to chunks of pointers **/
+		FUObjectItem** Objects;
+		/** Number of elements we currently have **/
+		int32_t NumElements;
+		/** Maximum number of elements **/
+		int32_t MaxElements;
+		/** Number of chunks we currently have **/
+		int32_t NumChunks;
+		/** Maximum number of chunks **/
+		int32_t MaxChunks;
+		/** If requested, a contiguous memory where all objects are allocated **/
+		FUObjectItem* PreAllocatedObjects;
+	};
+#else
 	struct FChunkedFixedUObjectArray
 	{
 		/** Master table to chunks of pointers **/
@@ -81,6 +100,7 @@ public:
 		/** Number of chunks we currently have **/
 		int32_t NumChunks;
 	};
+#endif
 
 	typedef FChunkedFixedUObjectArray TypeUObjectArray;
 #endif

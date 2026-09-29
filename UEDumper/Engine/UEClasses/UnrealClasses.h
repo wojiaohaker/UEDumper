@@ -203,16 +203,6 @@ public:
 	static UClass* staticClass();
 };
 
-#if UE_VERSION >= UE_4_22
-class FStructBaseChain
-{
-public:
-	FStructBaseChain** StructBaseChainArray;
-	int32_t NumStructBasesInChainMinusOne;
-};
-
-#endif
-
 // https://github.com/EpicGames/UnrealEngine/blob/4.19/Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h#L218
 // https://github.com/EpicGames/UnrealEngine/blob/4.22/Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h#L248
 // https://github.com/EpicGames/UnrealEngine/blob/4.25/Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h#L283
@@ -1030,6 +1020,12 @@ public:
 	int32_t			ElementSize;
 	EPropertyFlags	PropertyFlags;
 	uint16_t		RepIndex;
+
+#if WITH_ANGELSCRIPT_PROPERTY_FLAGS
+	// Angelscript licensee fork inserts a uint16 of AS-specific property flags here (see UnrealType.h@FProperty).
+	// Without it the following 'Offset' would be read 4 bytes too early on that engine.
+	uint16_t		AngelscriptPropertyFlags;
+#endif
 
 	uint8_t			BlueprintReplicationCondition;
 	int32_t			Offset;

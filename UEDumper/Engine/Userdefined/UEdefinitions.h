@@ -65,12 +65,13 @@
 #define UE_5_05   14
 #define UE_5_06   15
 #define UE_5_07		16 // Fixes FFieldClass::Id offset
+#define UE_5_08		17 // UE 5.8.x (incl. the Angelscript licensee fork): FUObjectItem / FChunkedFixedUObjectArray / FProperty layout changed
 
 
 /* UE version settings */
 
 //set your games ue version
-#define UE_VERSION UE_4_27
+#define UE_VERSION UE_5_08
 
 
 /* SDK and MDK generation */
@@ -174,4 +175,15 @@
 
 // Define this as 0x8 for example, if dumping LongVinter
 // For this game 'UObject* FUObjectItem::Object' isn't at index 0x0.
+// UE 5.8 moved the merged 'FlagsAndRefCount' int64 to offset 0x0, so the Object pointer sits at 0x8.
+// This is only valid when FUObjectItem packing (UE_PACK_FUOBJECT_ITEM) is NOT enabled (the default); verify against your binary!
+#if UE_VERSION >= UE_5_08
+#define FUOBJECTITEM_OBJECTPTR_OFFSET 0x8
+#else
 #define FUOBJECTITEM_OBJECTPTR_OFFSET 0x0
+#endif
+
+// The Angelscript licensee fork (e.g. UE_Angelscript_SC) inserts an extra 'uint16 AngelscriptPropertyFlags'
+// member into FProperty right after 'RepIndex'. If your engine has that modification keep this TRUE,
+// otherwise every generated member Offset would be shifted by 4 bytes.
+#define WITH_ANGELSCRIPT_PROPERTY_FLAGS TRUE

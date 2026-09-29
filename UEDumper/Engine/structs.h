@@ -84,6 +84,24 @@ struct FName
 #endif
 };
 
+#if UE_VERSION >= UE_5_08
+// UE 5.8: FUObjectItem stores the merged EInternalObjectFlags(high)+RefCount(low) int64 first,
+// then the Object pointer. Only valid while FUObjectItem packing (UE_PACK_FUOBJECT_ITEM) is disabled (default).
+struct FUObjectItem
+{
+    // EInternalObjectFlags (high 32 bits) merged with RefCount (low 32 bits)
+    int64_t FlagsAndRefCount;
+    // Pointer to the allocated object
+    uintptr_t Object;
+    // Weak Object Pointer Serial number associated with the object
+    int32_t SerialNumber;
+    // UObject Owner Cluster Index
+    int32_t ClusterRootIndex;
+#if STATS
+    uintptr_t StatID;
+#endif
+};
+#else
 struct FUObjectItem
 {
     // Pointer to the allocated object
@@ -98,6 +116,7 @@ struct FUObjectItem
     uintptr_t StatID;
 #endif
 };
+#endif
 
 
 template <class T>
